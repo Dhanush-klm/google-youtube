@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { extractVideoId } from '../youtube/route';
 
+// Replace the localhost URL with your deployed server URL
+const TRANSCRIPT_API_URL = process.env.TRANSCRIPT_API_URL || 'http://localhost:5000';
+
 export async function POST(request: Request) {
   try {
     const { url } = await request.json();
@@ -16,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     // Make request to your Python transcript service
-    const response = await fetch('http://localhost:5000/get-transcript', {
+    const response = await fetch(`${TRANSCRIPT_API_URL}/get-transcript`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
