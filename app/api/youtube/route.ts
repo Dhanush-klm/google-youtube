@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   }
 }
 
-function extractVideoId(url: string): string | null {
+export function extractVideoId(url: string): string | null {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu.be\/)([^&\n?#]+)/,
     /youtube.com\/embed\/([^&\n?#]+)/,
