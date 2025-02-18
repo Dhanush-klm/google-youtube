@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { extractVideoId } from '../youtube/route';
+import { extractVideoId } from '@/app/utils/youtube';
 
 // Replace the localhost URL with your deployed server URL
 const TRANSCRIPT_API_URL = process.env.TRANSCRIPT_API_URL || 'http://localhost:5000';
