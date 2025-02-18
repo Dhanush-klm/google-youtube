@@ -2,16 +2,15 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-interface VideoDetails {
-  title: string;
-  description: string;
-  viewCount: string;
-  likeCount: string;
+interface TranscriptEntry {
+  text: string;
+  start: number;
+  duration: number;
 }
 
-export default function Home() {
+export default function TranscriptPage() {
   const [url, setUrl] = useState('');
-  const [videoDetails, setVideoDetails] = useState<VideoDetails | null>(null);
+  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,7 +18,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/youtube', {
+      const response = await fetch('/api/transcript', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,9 +27,11 @@ export default function Home() {
       });
 
       const data = await response.json();
-      setVideoDetails(data);
+      if (data.transcript) {
+        setTranscript(data.transcript);
+      }
     } catch (error) {
-      console.error('Error fetching video details:', error);
+      console.error('Error fetching transcript:', error);
     } finally {
       setLoading(false);
     }
@@ -38,16 +39,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen p-8">
+      <nav className="max-w-2xl mx-auto mb-8">
+        <Link href="/" className="text-blue-500 hover:text-blue-600">
+          ← Back to Video Details
+        </Link>
+      </nav>
+      
       <main className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">YouTube Video Details</h1>
-          <Link 
-            href="/transcript" 
-            className="text-blue-500 hover:text-blue-600 flex items-center gap-2"
-          >
-            Get Video Transcript →
-          </Link>
-        </div>
+        <h1 className="text-2xl font-bold mb-6">YouTube Transcript Extractor</h1>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -64,25 +63,26 @@ export default function Home() {
             disabled={loading}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400"
           >
-            {loading ? 'Processing...' : 'Get Details'}
+            {loading ? 'Processing...' : 'Get Transcript'}
           </button>
         </form>
 
-        {videoDetails && (
+        {transcript.length > 0 && (
           <div className="mt-8 p-4 border rounded-md">
-            <h2 className="text-xl font-semibold">{videoDetails.title}</h2>
-            <p className="mt-2">{videoDetails.description}</p>
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div>
-                <span className="font-medium">Views:</span> {videoDetails.viewCount}
-              </div>
-              <div>
-                <span className="font-medium">Likes:</span> {videoDetails.likeCount}
-              </div>
+            <h2 className="text-xl font-semibold mb-4">Transcript</h2>
+            <div className="space-y-4">
+              {transcript.map((entry, index) => (
+                <div key={index} className="p-2 hover:bg-gray-50">
+                  <p>{entry.text}</p>
+                  <span className="text-sm text-gray-500">
+                    {Math.floor(entry.start / 60)}:{Math.floor(entry.start % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </main>
     </div>
   );
-}
+} 
